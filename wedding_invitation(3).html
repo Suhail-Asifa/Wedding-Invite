@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedding Invitation – Ahmed Suhail & Asifa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── TOKENS ────────────────────────────────────────────── */
+    :root {
+      --black:      #090909;
+      --black2:     #111111;
+      --black3:     #1a1a1a;
+      --gold:       #C9A84C;
+      --gold-lt:    #E8C97A;
+      --gold-dim:   rgba(201,168,76,0.18);
+      --gold-div:   rgba(201,168,76,0.30);
+      --white:      #FFFFFF;
+      --white-soft: rgba(255,255,255,0.85);
+      --muted:      rgba(255,255,255,0.45);
+      --card-bg:    rgba(255,255,255,0.04);
+      --card-border:rgba(201,168,76,0.25);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'EB Garamond', serif;
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       DOOR SCREEN — Pointed Arch Portal
+    ═══════════════════════════════════════════════════════════ */
+    #door-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--black);
+      pointer-events: all;
+    }
+    #door-screen.opened { pointer-events: none; }
+
+    /* Portal frame — full view width, aligned with invitation */
+    .door-portal {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: min(98vw, 680px);
+      height: 100%;
+      z-index: 2;
+    }
+
+    /* Pointed-arch door panels */
+    .door-wrap {
+      position: absolute; inset: 0;
+      display: flex;
+      align-items: stretch;
+    }
+    .door-panel {
+      flex: 1; height: 100%;
+      background: linear-gradient(165deg, #1a1510 0%, #0c0a08 55%, #11100c 100%);
+      border: none;
+      position: relative;
+      transition: transform 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: left center;
+      overflow: hidden;
+      clip-path: polygon(0 7%, 0 100%, 100% 100%, 100% 7%);
+    }
+    .door-panel.left  { margin-right: 1px; }
+    .door-panel.right {
+      transform-origin: right center;
+      clip-path: polygon(100% 7%, 100% 100%, 0 100%, 0 7%);
+      margin-left: 1px;
+    }
+
+    /* Geometric arabesque overlay */
+    .door-arabesque {
+      position: absolute; inset: 0;
+      opacity: 0.13;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%23C9A84C' stroke-width='0.55'%3E%3Cpath d='M40 0v80M0 40h80M0 0l80 80M80 0L0 80'/%3E%3Ccircle cx='40' cy='40' r='14'/%3E%3Cpath d='M40 8l6 14h15l-12 9 5 14-14-10-14 10 5-14-12-9h15z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 80px 80px;
+    }
+
+    /* Door frame — soft shadow at centre seam */
+    .door-panel.left  { box-shadow: inset -4px 0 18px rgba(0,0,0,0.6); }
+    .door-panel.right { box-shadow: inset  4px 0 18px rgba(0,0,0,0.6); }
+
+    /* Gold band beneath arch peak */
+    .door-panel::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.5;
+    }
+
+    /* Nested arch frame inset */
+    .door-inner {
+      position: absolute;
+      inset: 52px 18px 24px;
+      border: 1px solid rgba(201,168,76,0.32);
+      pointer-events: none;
+    }
+    .door-panel.left  .door-inner { clip-path: polygon(0% 6%, 0% 100%, 100% 100%, 100% 6%); }
+    .door-panel.right .door-inner { clip-path: polygon(100% 6%, 100% 100%, 0% 100%, 0% 6%); }
+    .door-inner::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(201,168,76,0.14);
+    }
+    .door-inner::after {
+      content: '✦';
+      position: absolute;
+      top: 22%;
+      font-size: 11px;
+      color: rgba(201,168,76,0.35);
+      line-height: 1;
+    }
+    .door-panel.left  .door-inner::after { right: 18%; }
+    .door-panel.right .door-inner::after { left: 18%; }
+
+    /* Grand Islamic portal arch frame */
+    .door-arch {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .door-arch svg {
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* Islamic ring knocker */
+    .door-knob {
+      position: absolute;
+      top: 52%;
+      width: 22px; height: 28px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .door-knob::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 22px; height: 22px;
+      border: 2.5px solid var(--gold);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(201,168,76,0.4), inset 0 0 6px rgba(201,168,76,0.15);
+    }
+    .door-knob::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 14px; height: 10px;
+      background: linear-gradient(180deg, var(--gold), #8a6a20);
+      clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .door-panel.left  .door-knob { right: 12%; }
+    .door-panel.right .door-knob { left:  12%; }
+
+    /* Centre ornament between panels */
+    .door-center-ornament {
+      position: absolute;
+      top: 38%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 5;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      width: 100%;
+      max-width: 100%;
+      padding: 0 20px;
+    }
+    .door-center-ornament .arabic {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(24px, 5.2vw, 36px);
+      color: var(--gold);
+      display: block;
+      line-height: 1.6;
+      opacity: 1;
+      animation: arabicGlow 3.2s ease-in-out infinite;
+    }
+    @keyframes arabicGlow {
+      0%, 100% {
+        color: #C9A84C;
+        text-shadow:
+          0 0 1px rgba(201,168,76,0.75),
+          0 0 3px rgba(201,168,76,0.67),
+          0 0 8px rgba(201,168,76,0.52),
+          0 0 14px rgba(201,168,76,0.30);
+      }
+      50% {
+        color: #E8C97A;
+        text-shadow:
+          0 0 1px rgba(232,201,122,0.92),
+          0 0 4px rgba(201,168,76,0.85),
+          0 0 10px rgba(201,168,76,0.62),
+          0 0 16px rgba(201,168,76,0.36);
+      }
+    }
+
+    /* Tap CTA — clickable button; audio starts on this tap */
+    .door-tap-cta {
+      position: absolute;
+      top: 58%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 5;
+      width: 100%;
+      text-align: center;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 0.35s ease;
+    }
+    .door-tap-cta:focus-visible {
+      outline: 1px solid rgba(201,168,76,0.5);
+      outline-offset: 4px;
+    }
+    .door-tap-cta .tap-hint {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(14px, 3.8vw, 17px);
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      opacity: 1;
+      animation: tapGlow 2.4s ease-in-out infinite;
+    }
+    @keyframes tapGlow {
+      0%, 100% {
+        color: #C9A84C;
+        text-shadow:
+          0 0 1px rgba(201,168,76,0.70),
+          0 0 3px rgba(201,168,76,0.60),
+          0 0 7px rgba(201,168,76,0.42);
+      }
+      50% {
+        color: #E8C97A;
+        text-shadow:
+          0 0 1px rgba(232,201,122,0.88),
+          0 0 4px rgba(201,168,76,0.69),
+          0 0 9px rgba(201,168,76,0.48);
+      }
+    }
+
+    /* Opened state */
+    #door-screen.opened .door-panel.left  { transform: perspective(1200px) rotateY(-105deg); }
+    #door-screen.opened .door-panel.right { transform: perspective(1200px) rotateY( 105deg); }
+    #door-screen.opened .door-center-ornament,
+    #door-screen.opened .door-tap-cta { opacity: 0; transition: opacity 0.25s ease; }
+    #door-screen.opened .door-arch { opacity: 0; transition: opacity 0.4s ease; }
+    #door-screen.fade-out { opacity: 0; transition: opacity 0.6s ease; }
+
+    /* ═══════════════════════════════════════════════════════════
+       GOLDEN PETALS
+    ═══════════════════════════════════════════════════════════ */
+    .petal-bg {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .petal {
+      position: absolute;
+      border-radius: 50% 0 50% 0;
+      opacity: 0;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-20px) rotate(0deg) scale(1);   opacity: 0.72; }
+      80%  { opacity: 0.54; }
+      100% { transform: translateY(110vh) rotate(420deg) scale(0.7); opacity: 0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       PAGE
+    ═══════════════════════════════════════════════════════════ */
+    .page {
+      position: relative; z-index: 2;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      isolation: isolate;
+    }
+    .page.visible { opacity: 1; }
+    .page > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 72px 0 48px;
+    }
+    .family-invite-banner {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(12px, 3.2vw, 15px);
+      letter-spacing: 2.5px;
+      line-height: 1.85;
+      color: var(--gold);
+      max-width: 440px;
+      margin: 0 auto 40px;
+      opacity: 0;
+    }
+    .family-invite-banner .family-invite-accent {
+      display: block;
+      margin-top: 6px;
+      font-size: clamp(13px, 3.5vw, 16px);
+      letter-spacing: 3px;
+      color: var(--gold-lt);
+    }
+    .hero::before {
+      content: '';
+      display: block;
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, transparent, var(--gold));
+      margin: 0 auto 32px;
+    }
+    .hero-label {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: none;
+    }
+    .hero-bismillah {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 24px;
+      color: rgba(201,168,76,0.75);
+      margin-bottom: 36px;
+      opacity: 0;
+    }
+    .ornament {
+      color: var(--gold);
+      font-size: 30px;
+      line-height: 1;
+      display: block;
+      opacity: 0;
+    }
+    .hero-names {
+      margin: 28px 0;
+      opacity: 0;
+    }
+    .groom-name, .bride-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(44px, 11vw, 72px);
+      line-height: 1.05;
+      color: var(--white);
+      letter-spacing: 1px;
+      display: block;
+    }
+    .ampersand {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: clamp(28px, 7vw, 46px);
+      color: var(--gold);
+      display: block;
+      line-height: 1.4;
+    }
+    .hero-invite-text {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 18px;
+      color: var(--muted);
+      margin-top: 28px;
+      line-height: 1.8;
+      opacity: 0;
+    }
+
+    /* Hero text — smooth fade-in after doors open */
+    .hero-animate .hero-label         { animation: fadeIn 0.9s ease 0.1s forwards; }
+    .hero-animate .hero-bismillah     { animation: fadeIn 0.9s ease 0.25s forwards; }
+    .hero-animate .family-invite-banner { animation: fadeIn 0.9s ease 0.4s forwards; }
+    .hero-animate .ornament           { animation: fadeIn 0.9s ease 0.55s forwards; }
+    .hero-animate .hero-names         { animation: fadeIn 0.9s ease 0.7s forwards; }
+    .hero-animate .hero-invite-text   { animation: fadeIn 0.9s ease 0.85s forwards; }
+
+    /* Golden glow & shine — matches door screen (arabicGlow / tapGlow) */
+    .page.golden-glow .hero-label,
+    .page.golden-glow .ornament,
+    .page.golden-glow .ampersand,
+    .page.golden-glow .section-label,
+    .page.golden-glow .event-type,
+    .page.golden-glow .event-venue,
+    .page.golden-glow .cd-label,
+    .page.golden-glow .family-col h3,
+    .page.golden-glow .location-venue,
+    .page.golden-glow .closing-attribution,
+    .page.golden-glow .sidra-label,
+    .page.golden-glow .sidra-name,
+    .page.golden-glow .corner-star,
+    .page.golden-glow .directions-btn,
+    .page.golden-glow .family-invite-banner {
+      animation: tapGlow 2.4s ease-in-out infinite;
+    }
+    .page.golden-glow .hero-bismillah,
+    .page.golden-glow .event-time,
+    .page.golden-glow .late-prefix,
+    .page.golden-glow .families-sep,
+    .page.golden-glow .footer-line {
+      animation: arabicGlow 3.2s ease-in-out infinite;
+    }
+    .page.golden-glow .hero-label,
+    .page.golden-glow .hero-bismillah,
+    .page.golden-glow .family-invite-banner,
+    .page.golden-glow .ornament,
+    .page.golden-glow .hero-names,
+    .page.golden-glow .hero-invite-text {
+      opacity: 1;
+    }
+
+    /* ─── DIVIDER ────────────────────────────────────────────── */
+    .divider {
+      display: flex; align-items: center; gap: 16px;
+      margin: 44px 0;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--gold-div); }
+    .divider-diamond {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    /* ─── SECTION LABEL ─────────────────────────────────────── */
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ─── CARD ──────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 2px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .card.visible { opacity: 1; transform: translateY(0); }
+    .card::before, .card::after {
+      content: '✦';
+      position: absolute;
+      color: var(--gold);
+      font-size: 36px;
+      opacity: 0.12;
+    }
+    .card::before { top: 6px; left: 10px; }
+    .card::after  { bottom: 6px; right: 10px; }
+
+    /* Subtle inner glow on cards */
+    .card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top, rgba(201,168,76,0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    /* Re-add corner star since ::after is now glow */
+    .card .corner-star {
+      position: absolute;
+      color: var(--gold);
+      font-size: 20px;
+      opacity: 0.18;
+      font-style: normal;
+    }
+    .card .corner-star.tl { top: 8px; left: 12px; }
+    .card .corner-star.br { bottom: 8px; right: 12px; }
+
+    .event-type {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .event-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 36px;
+      color: var(--white);
+      line-height: 1.2;
+    }
+    .event-day {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .event-time {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 20px;
+      color: var(--gold-lt);
+      margin: 16px 0 0;
+    }
+    .event-venue {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--gold);
+      margin: 20px 0 6px;
+    }
+    .event-address {
+      font-size: 16px;
+      color: var(--muted);
+      font-style: italic;
+      line-height: 1.6;
+    }
+
+    /* ─── COUNTDOWN ─────────────────────────────────────────── */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .cd-unit {
+      background: rgba(201,168,76,0.06);
+      border: 1px solid var(--gold-div);
+      padding: 18px 8px;
+      border-radius: 2px;
+    }
+    .cd-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 38px;
+      font-weight: 300;
+      color: var(--white);
+      display: block;
+      line-height: 1;
+    }
+    .cd-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* ─── FAMILIES ──────────────────────────────────────────── */
+    .families-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
+      gap: 20px 12px;
+      text-align: center;
+    }
+    .family-col h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .family-members {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .family-member {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      width: 100%;
+    }
+    .family-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(14px, 3.4vw, 17px);
+      color: var(--white-soft);
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+    .family-role {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .late-prefix {
+      font-style: italic;
+      color: rgba(201,168,76,0.65);
+      font-size: 0.9em;
+    }
+    .families-sep {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 28px;
+      color: rgba(201,168,76,0.4);
+      padding-top: 32px;
+    }
+
+    /* ─── LOCATION CARD ─────────────────────────────────────── */
+    .location-venue  { color: var(--gold) !important; }
+    .location-address{ color: var(--muted) !important; }
+
+    .directions-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      padding: 14px 32px;
+      transition: background 0.3s, color 0.3s;
+    }
+    .directions-btn:hover {
+      background: var(--gold);
+      color: var(--black);
+    }
+
+    /* ─── CLOSING ────────────────────────────────────────────── */
+    .closing {
+      text-align: center;
+      padding: 52px 0 24px;
+    }
+    .closing-verse {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 20px;
+      color: var(--muted);
+      line-height: 1.85;
+      max-width: 420px;
+      margin: 0 auto 16px;
+    }
+    .closing-attribution {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--gold);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    .footer-line {
+      text-align: center;
+      padding-top: 32px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(201,168,76,0.4);
+    }
+    .footer-line::before {
+      content: '';
+      display: block;
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, var(--gold-div), transparent);
+      margin: 0 auto 16px;
+    }
+
+    /* ─── SIDRA CREDIT ───────────────────────────────────────── */
+    .sidra-credit {
+      text-align: center;
+      padding: 36px 20px 64px;
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .sidra-credit.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .sidra-credit::before {
+      content: '✦  ♡  ✦';
+      display: block;
+      font-size: 11px;
+      letter-spacing: 10px;
+      color: rgba(201,168,76,0.55);
+      margin-bottom: 18px;
+    }
+    .sidra-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(201,168,76,0.75);
+      margin-bottom: 8px;
+    }
+    .sidra-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(28px, 7vw, 36px);
+      color: var(--gold);
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .sidra-note {
+      font-family: 'EB Garamond', serif;
+      font-style: italic;
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    /* ─── BACKGROUND MUSIC TOGGLE ───────────────────────────── */
+    .music-toggle {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 900;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.45);
+      background: rgba(9,9,9,0.85);
+      color: var(--gold);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.25s, background 0.25s, opacity 0.4s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .music-toggle.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .music-toggle:hover {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.12);
+    }
+    .music-toggle svg {
+      width: 18px; height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .music-toggle .icon-off { display: none; }
+    .music-toggle.muted .icon-on  { display: none; }
+    .music-toggle.muted .icon-off { display: block; }
+
+    /* ─── KEYFRAMES ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .card { padding: 28px 18px; }
+      .countdown-grid { gap: 8px; }
+      .cd-num { font-size: 28px; }
+      .families-grid { grid-template-columns: 1fr; gap: 8px; }
+      .families-sep { padding-top: 0; }
+      .family-name { white-space: normal; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, .petal { animation: none !important; transition: none !important; }
+      .page { opacity: 1 !important; }
+      #door-screen { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     DOOR SCREEN
+══════════════════════════════════════════════════════════ -->
+<div id="door-screen" data-variant="pointed">
+  <div class="door-portal">
+    <div class="door-arch" aria-hidden="true">
+      <svg viewBox="0 0 400 750" preserveAspectRatio="xMidYMin meet" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="380" height="730" stroke="rgba(201,168,76,0.35)" stroke-width="1.5"/>
+        <rect x="22" y="22" width="356" height="706" stroke="rgba(201,168,76,0.12)" stroke-width="1"/>
+        <path d="M30 740 V120 Q30 35 200 22 Q370 35 370 120 V740" stroke="url(#archGrad)" stroke-width="2"/>
+        <path d="M50 740 V140 Q50 70 200 58 Q350 70 350 140 V740" stroke="rgba(201,168,76,0.22)" stroke-width="1"/>
+        <path d="M30 120 Q200 22 370 120" stroke="rgba(201,168,76,0.1)" stroke-width="0.75" stroke-dasharray="4 6"/>
+        <defs>
+          <linearGradient id="archGrad" x1="0" y1="0" x2="400" y2="0">
+            <stop offset="0%" stop-color="rgba(201,168,76,0.25)"/>
+            <stop offset="30%" stop-color="#C9A84C"/>
+            <stop offset="50%" stop-color="#E8C97A"/>
+            <stop offset="70%" stop-color="#C9A84C"/>
+            <stop offset="100%" stop-color="rgba(201,168,76,0.25)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="door-wrap">
+      <div class="door-panel left">
+        <div class="door-arabesque" aria-hidden="true"></div>
+        <div class="door-inner"></div>
+        <div class="door-knob"></div>
+      </div>
+      <div class="door-panel right">
+        <div class="door-arabesque" aria-hidden="true"></div>
+        <div class="door-inner"></div>
+        <div class="door-knob"></div>
+      </div>
+    </div>
+    <div class="door-center-ornament">
+      <span class="arabic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</span>
+    </div>
+    <button type="button" class="door-tap-cta" id="doorTapBtn" aria-label="Tap to open invitation">
+      <span class="tap-hint">Tap to Open</span>
+    </button>
+  </div><!-- /.door-portal -->
+</div>
+
+<!-- Golden petals — fixed layer, falls on every section while scrolling -->
+<div class="petal-bg" id="petalBg"></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     INVITATION PAGE
+══════════════════════════════════════════════════════════ -->
+<div class="page" id="invitePage">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <p class="hero-label">With the Blessings of Allah</p>
+    <p class="hero-bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+    <p class="family-invite-banner">
+      The Family of Hyder Ali<br/>
+      <span class="family-invite-accent">Invites You</span>
+    </p>
+    <span class="ornament">❧</span>
+    <div class="hero-names">
+      <span class="groom-name">Ahmed Suhail</span>
+      <span class="ampersand">&amp;</span>
+      <span class="bride-name">Asifa</span>
+    </div>
+    <p class="hero-invite-text">
+      Together with their families<br/>
+      joyfully invite you to celebrate<br/>
+      their union
+    </p>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+  <!-- COUNTDOWN -->
+  <p class="section-label">Counting Down To The Big Day</p>
+  <div class="card" data-reveal>
+    <span class="corner-star tl">✦</span>
+    <span class="corner-star br">✦</span>
+    <div class="countdown-grid" id="countdown">
+      <div class="cd-unit"><span class="cd-num" id="cd-days">00</span><span class="cd-label">Days</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-hrs">00</span><span class="cd-label">Hours</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-min">00</span><span class="cd-label">Minutes</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-sec">00</span><span class="cd-label">Seconds</span></div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+  <!-- NIKKAH -->
+  <p class="section-label">Nikkah Ceremony</p>
+  <div class="card" data-reveal>
+    <span class="corner-star tl">✦</span>
+    <span class="corner-star br">✦</span>
+    <p class="event-type">NIKKAH</p>
+    <p class="event-date">2nd August 2026</p>
+    <p class="event-day">SUNDAY</p>
+    <p class="event-time">Time - 10 AM to 11 AM</p>
+    <br/>
+    <p class="event-venue">Masjid-e-Fatima</p>
+    <p class="event-address">Fort Salem, Tamil Nadu, India</p>
+  </div>
+
+  <!-- WALIMA -->
+  <p class="section-label">Walima Reception</p>
+  <div class="card" data-reveal>
+    <span class="corner-star tl">✦</span>
+    <span class="corner-star br">✦</span>
+    <p class="event-type">WALIMA</p>
+    <p class="event-date">2nd August 2026</p>
+    <p class="event-day">SUNDAY</p>
+    <p class="event-time">From 12.30 PM</p>
+    <br/>
+    <p class="event-venue">Susan Ammal Mahal</p>
+    <p class="event-address">Old Market Rd, Shevapet,<br/>Salem, Tamil Nadu, India</p>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+  <!-- FAMILIES -->
+  <p class="section-label">Blessed by Both Families</p>
+  <div class="card" data-reveal>
+    <span class="corner-star tl">✦</span>
+    <span class="corner-star br">✦</span>
+    <div class="families-grid">
+      <div class="family-col">
+        <h3>Groom's Family</h3>
+        <div class="family-members">
+          <div class="family-member">
+            <span class="family-name"><span class="late-prefix">Late</span> Mr. Mohammed Babu</span>
+            <span class="family-role">Father of the Groom</span>
+          </div>
+          <div class="family-member">
+            <span class="family-name">Mrs. Shafiya Mohammed Babu</span>
+            <span class="family-role">Mother of the Groom</span>
+          </div>
+        </div>
+      </div>
+      <div class="families-sep">&amp;</div>
+      <div class="family-col">
+        <h3>Bride's Family</h3>
+        <div class="family-members">
+          <div class="family-member">
+            <span class="family-name">Mr. Khaleel Rahman</span>
+            <span class="family-role">Father of the Bride</span>
+          </div>
+          <div class="family-member">
+            <span class="family-name">Mrs. Beema Khaleel</span>
+            <span class="family-role">Mother of the Bride</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+
+  <!-- LOCATION -->
+  <p class="section-label">Find The Venue</p>
+  <div class="card" data-reveal style="padding:0; overflow:hidden;">
+    <span class="corner-star tl">✦</span>
+    <span class="corner-star br">✦</span>
+    <div style="padding: 28px 28px 20px;">
+      <p class="event-venue location-venue" style="margin:0 0 6px;">Susan Ammal Mahal</p>
+      <p class="event-address location-address">Old Market Rd, Shevapet, Salem, Tamil Nadu, India</p>
+    </div>
+    <div style="position:relative; width:100%; height:220px; overflow:hidden;">
+      <iframe
+        src="https://www.google.com/maps?q=Susan+Ammal+Mahal,+Old+Market+Rd,+Shevapet,+Salem,+Tamil+Nadu&output=embed"
+        width="100%" height="220"
+        style="border:0; display:block; filter:invert(90%) hue-rotate(180deg) saturate(0.6) brightness(0.75);"
+        allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+      <div style="position:absolute;inset:0;pointer-events:none;border:1px solid rgba(201,168,76,0.25);"></div>
+    </div>
+    <div style="padding: 22px 28px 28px;">
+      <a href="https://maps.app.goo.gl/N9B5CLEf9mkGWuJq6" target="_blank" class="directions-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        GET DIRECTIONS
+      </a>
+    </div>
+  </div>
+
+  <!-- CLOSING VERSE -->
+  <div class="closing">
+    <p class="closing-verse">
+      "And He created for you from yourselves mates that you may find tranquillity in them, and He placed between you affection and mercy."
+    </p>
+    <p class="closing-attribution">— Surah Ar-Rum 30:21</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-line">Ahmed Suhail &amp; Asifa · August 2026</div>
+
+  <!-- CREDIT -->
+  <div class="sidra-credit" data-reveal>
+    <p class="sidra-label">Best Compliments from</p>
+    <p class="sidra-name">Sidra</p>
+    <p class="sidra-note">with love · niece of the groom</p>
+  </div>
+
+</div><!-- /page -->
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="leberch-invitation-wedding-375839.mp3" type="audio/mpeg" />
+</audio>
+
+<button id="musicToggle" class="music-toggle muted" type="button" aria-label="Toggle background music">
+  <svg class="icon-on" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M9 18V6l10-2v14"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>
+  </svg>
+  <svg class="icon-off" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M9 18V6l10-2v14"/><line x1="4" y1="4" x2="20" y2="20"/>
+  </svg>
+</button>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════ -->
+<script>
+/* ── DOOR OPEN ─────────────────────────────────────────── */
+const doorScreen  = document.getElementById('door-screen');
+const doorTapBtn  = document.getElementById('doorTapBtn');
+const invitePage  = document.getElementById('invitePage');
+const hero        = document.getElementById('hero');
+const bgMusic     = document.getElementById('bgMusic');
+const musicToggle = document.getElementById('musicToggle');
+
+let doorOpened = false;
+let musicPlaying = false;
+
+bgMusic.volume = 0.45;
+
+function handleDoorTap() {
+  if (doorOpened) return;
+
+  /* Must run synchronously inside the button click — browsers require a direct user gesture */
+  musicToggle.classList.add('visible');
+  const playPromise = bgMusic.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      musicPlaying = true;
+      musicToggle.classList.remove('muted');
+    }).catch(() => {
+      musicToggle.classList.add('muted');
+    });
+  }
+
+  openDoor();
+}
+
+musicToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (musicPlaying) {
+    bgMusic.pause();
+    musicPlaying = false;
+    musicToggle.classList.add('muted');
+  } else {
+    bgMusic.play().then(() => {
+      musicPlaying = true;
+      musicToggle.classList.remove('muted');
+    }).catch(() => {});
+  }
+});
+
+function openDoor() {
+  if (doorOpened) return;
+  doorOpened = true;
+
+  invitePage.classList.add('visible');
+  doorScreen.classList.add('opened');
+
+  setTimeout(() => {
+    doorScreen.classList.add('fade-out');
+    hero.classList.add('hero-animate');
+    invitePage.classList.add('golden-glow');
+  }, 2500);
+  setTimeout(() => {
+    doorScreen.style.display = 'none';
+    startPetals();
+  }, 3100);
+}
+
+doorTapBtn.addEventListener('click', handleDoorTap);
+
+/* ── GOLDEN PETALS ─────────────────────────────────────── */
+const petalColors = ['#C9A84C','#E8C97A','#f0d885','#b8903a','#ffe499'];
+const container   = document.getElementById('petalBg');
+let petalsStarted = false;
+
+function startPetals() {
+  if (petalsStarted) return;
+  petalsStarted = true;
+  // Burst of initial petals
+  for (let i = 0; i < 18; i++) makePetal(true);
+  setInterval(() => makePetal(false), 600);
+}
+
+function makePetal(burst) {
+  const p = document.createElement('div');
+  p.classList.add('petal');
+  const size = 5 + Math.random() * 10;
+  const delay = burst ? Math.random() * 2 : 0;
+  p.style.cssText = `
+    left: ${Math.random() * 100}%;
+    width: ${size}px;
+    height: ${size * 1.7}px;
+    background: ${petalColors[Math.floor(Math.random() * petalColors.length)]};
+    animation-duration: ${7 + Math.random() * 9}s;
+    animation-delay: ${delay}s;
+    box-shadow: 0 0 ${3 + Math.random()*4}px rgba(201,168,76,0.4);
+  `;
+  container.appendChild(p);
+  setTimeout(() => p.remove(), (burst ? delay * 1000 : 0) + 18000);
+}
+
+/* ── COUNTDOWN ─────────────────────────────────────────── */
+// ✏️ EDIT: Set your wedding date (YYYY-MM-DDTHH:MM:SS)
+const weddingDate = new Date('2026-08-02T09:00:00');
+function updateCountdown() {
+  const diff = weddingDate - new Date();
+  if (diff <= 0) {
+    ['cd-days','cd-hrs','cd-min','cd-sec'].forEach(id => document.getElementById(id).textContent = '00');
+    return;
+  }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = String(d).padStart(2,'0');
+  document.getElementById('cd-hrs').textContent  = String(h).padStart(2,'0');
+  document.getElementById('cd-min').textContent  = String(m).padStart(2,'0');
+  document.getElementById('cd-sec').textContent  = String(s).padStart(2,'0');
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ── SCROLL REVEAL ─────────────────────────────────────── */
+const revealEls = document.querySelectorAll('[data-reveal]');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => obs.observe(el));
+
+/* ── STATIC EXPORT (?export=1) — high-res capture, no door/petals ── */
+if (new URLSearchParams(location.search).has('export')) {
+  doorOpened = true;
+  doorScreen.style.display = 'none';
+  invitePage.classList.add('visible', 'golden-glow');
+  hero.classList.add('hero-animate');
+  document.getElementById('petalBg').style.display = 'none';
+  musicToggle?.remove();
+  hero.querySelectorAll('.hero-label, .hero-bismillah, .family-invite-banner, .ornament, .hero-names, .hero-invite-text').forEach(el => {
+    el.style.opacity = '1';
+    el.style.animation = 'none';
+  });
+}
+</script>
+</body>
+</html>
